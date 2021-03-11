@@ -39,13 +39,13 @@ function parseJSONData(arr) {
         "links": []
     };
     $.each(arr, function (_, obj) {
-        dict[obj.name] = obj;
+        dict[obj.paperId] = obj;
         data.nodes.push(obj);
     });
     $.each(arr, function (_, obj) {
         if (obj.references !== undefined) {
             $.each(obj.references, function (_, ref) {
-                data.links.push({"source": obj.name, "target": ref});
+                data.links.push({"source": obj.paperId, "target": ref});
             });
         }
     });
@@ -203,61 +203,70 @@ function hideInfobox() {
     d3.select("#js-infobox").style("display", "none");
 }
 
-function appendNewChildren(node) {
-    if ('paperId' in node) {
-        const url = 'https://api.semanticscholar.org/v1/paper/' + node.paperId;
-        $.get(url, function (data) {
-            if ('citations' in data) {
-                data.citations.forEach(function (citation) {
-                    if (citation.isInfluential) {
-                        const found = graphJson.find(paper => paper.paperId === citation.paperId);
-                        if (found !== undefined) {
-                            found.references.push(node.name);
-                        } else {
-                            graphJson.push({
-                                "name": citation.title.replace(/\s/g, "_"),
-                                "year": citation.year,
-                                "author": citation.authors.map(author => author.name),
-                                "toolurl": "",
-                                "miscurl": ['https://api.semanticscholar.org/' + citation.paperId],
-                                "targets": [""],
-                                "references": [node.name],
-                                "color": "greybox",
-                                "paperId": citation.paperId
-                            })
-                        }
-                    }
-                })
-            }
-            if ('references' in data) {
-                data.references.forEach(function (ref) {
-                    if (ref.isInfluential) {
-                        const found = graphJson.find(paper => paper.paperId === ref.paperId);
-                        if (found === undefined) {
-                            graphJson.push({
-                                "name": ref.title.replace(/\s/g, "_"),
-                                "year": ref.year,
-                                "author": ref.authors.map(author => author.name),
-                                "toolurl": "",
-                                "miscurl": ['https://api.semanticscholar.org/' + ref.paperId],
-                                "targets": [""],
-                                "references": [],
-                                "color": "greybox",
-                                "paperId": ref.paperId
-                            })
-                        }
-                        const foundNode = graphJson.find(paper => paper.paperId === node.paperId);
-                        if (foundNode !== undefined) {
-                            const newItem = ref.title.replace(/\s/g, "_");
-                            foundNode.references.indexOf(newItem) === -1 && foundNode.references.push(newItem);
-                        }
-                    }
-                })
-            }
-            drawGraph(graphJson);
-        })
+function createPaperEntry(cite) {
+    return {
+        "name": cite.title.replace(/\s/g, "_"),
+        "year": cite.year,
+        "author": cite.authors.map(author => author.name),
+        "toolurl": "",
+        "miscurl": ['https://api.semanticscholar.org/' + cite.paperId],
+        "targets": [""],
+        "references": [],
+        "color": "greybox",
+        "paperId": cite.paperId
     }
+}
 
+function addPaper(paperId) {
+    const url = 'https://api.semanticscholar.org/v1/paper/' + paperId;
+
+    $.get({
+        url: url,
+        success: function (data) {
+            const newPaper = createPaperEntry(data);
+            graphJson.push(newPaper)
+        },
+        async: false
+    })
+}
+
+function expandCitations(paperId) {
+    const url = 'https://api.semanticscholar.org/v1/paper/' + paperId;
+
+    $.get(url, function (data) {
+        let currentNode = graphJson.find(paper => paper.paperId === paperId);
+
+        if ('citations' in data) {
+            data.citations.forEach(function (cite) {
+                if (cite.isInfluential) {
+                    const found = graphJson.find(paper => paper.paperId === cite.paperId);
+                    if (found !== undefined) {
+                        found.references.push(paperId);
+                    } else {
+                        const citeNode = createPaperEntry(cite)
+                        citeNode.references.push(paperId)
+                        graphJson.push(citeNode)
+                    }
+                }
+            })
+        }
+        if ('references' in data) {
+            data.references.forEach(function (ref) {
+                if (ref.isInfluential) {
+                    const found = graphJson.find(paper => paper.paperId === ref.paperId);
+                    if (found === undefined) {
+                        const refNode = createPaperEntry(ref)
+                        graphJson.push(refNode)
+                    }
+                    if (currentNode !== undefined) {
+                        const newItem = ref.paperId;
+                        currentNode.references.indexOf(newItem) === -1 && currentNode.references.push(newItem);
+                    }
+                }
+            })
+        }
+        drawGraph(graphJson);
+    })
 }
 
 function onClick(node) {
@@ -267,13 +276,18 @@ function onClick(node) {
     appendToolURL(list, node);
     appendMiscURL(list, node);
     appendSharableLink(list, node);
-    if (!('expanded' in node)) {
-        node.expanded = true;
-        appendNewChildren(node);
-    }
     setTitle(node);
     currentSelection = node.name;
     showInfobox();
+}
+
+function expandNode(node) {
+    if (!('expanded' in node)) {
+        node.expanded = true;
+        if ('paperId' in node) {
+            expandCitations(node.paperId)
+        }
+    }
 }
 
 function drawNodes(g, d, simulation) {
@@ -316,6 +330,7 @@ function drawNodes(g, d, simulation) {
             }
         })
         .on("click", onClick)
+        .on("dblclick", expandNode)
         .call(d3.drag()
             .on("start", dragStart)
             .on("drag", dragMiddle)
@@ -334,7 +349,8 @@ function drawNodes(g, d, simulation) {
         .text(function (d) {
             return d.name
         })
-        .on("click", onClick);
+        .on("click", onClick)
+        .on("dblclick", expandNode);
 
     const dragHandler = d3.drag()
         .on("start", dragStart)
@@ -537,7 +553,7 @@ function initSimulation(d, simulation, width, height, links, nodes) {
         .force("link",
             d3.forceLink()
                 .id(function (d) {
-                    return d.name;
+                    return d.paperId;
                 })
                 .strength(function (link) {
                     const diff = Math.abs(link.source.year - link.target.year);
@@ -777,8 +793,9 @@ function drawGraph(json) {
     }, 500);
 }
 
-d3.json("data/cfg_learn.json")
+d3.json("data/seed.json")
     .then(function (json) {
-        graphJson = json;
+        graphJson = []
+        json.forEach(paperId => addPaper(paperId))
         drawGraph(graphJson);
     });
