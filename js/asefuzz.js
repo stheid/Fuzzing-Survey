@@ -219,7 +219,7 @@ function appendNewChildren(node) {
                                 "year": citation.year,
                                 "author": citation.authors.map(author => author.name),
                                 "toolurl": "",
-                                "miscurl": [""],
+                                "miscurl": ['https://api.semanticscholar.org/' + citation.paperId],
                                 "targets": [""],
                                 "references": [node.name],
                                 "color": "greybox",
@@ -239,7 +239,7 @@ function appendNewChildren(node) {
                                 "year": ref.year,
                                 "author": ref.authors.map(author => author.name),
                                 "toolurl": "",
-                                "miscurl": [""],
+                                "miscurl": ['https://api.semanticscholar.org/' + ref.paperId],
                                 "targets": [""],
                                 "references": [],
                                 "color": "greybox",
@@ -247,8 +247,10 @@ function appendNewChildren(node) {
                             })
                         }
                         const foundNode = graphJson.find(paper => paper.paperId === node.paperId);
-                        const newItem = ref.title.replace(/\s/g, "_");
-                        foundNode.references.indexOf(newItem) === -1 && foundNode.references.push(newItem);
+                        if (foundNode !== undefined) {
+                            const newItem = ref.title.replace(/\s/g, "_");
+                            foundNode.references.indexOf(newItem) === -1 && foundNode.references.push(newItem);
+                        }
                     }
                 })
             }

@@ -1,0 +1,57 @@
+[
+  {
+    "name": "A_Hybrid_Language_Model_based_on_Stochastic_Context-free_Grammars",
+    "year": 2003,
+    "author": [
+      "Diego Linares",
+      "J. Benedí",
+      "Joan-Andreu Sánchez"
+    ],
+    "toolurl": "",
+    "targets": [
+      ""
+    ],
+    "miscurl": [
+      ""
+    ],
+    "references": [
+    ],
+    "paperId": "aae8d5c3f22ffe78fdce2a86bac97975786dc4fd"
+  },
+  {
+    "name": "Using_Contextual_Representations_to_Efficiently_Learn_Context-Free_Languages",
+    "year": 2010,
+    "author": [
+      "Alexander Clark",
+      "R. Eyraud",
+      "Amaury Habrard"
+    ],
+    "toolurl": "",
+    "targets": [
+      ""
+    ],
+    "miscurl": [
+      ""
+    ],
+    "references": [
+    ],
+    "paperId": "3751f7114f9d8bd4451159688c32e3c2e4985d06"
+  },
+  {
+    "name": "Inferring_context-free_grammars_for_domain-specific_languages",
+    "year": 2005,
+    "author": [
+      "Faizan Javed"
+    ],
+    "toolurl": "",
+    "targets": [
+      ""
+    ],
+    "miscurl": [
+      ""
+    ],
+    "references": [
+    ],
+    "paperId": "c21baf2a681a590b31f33064510cfe8e1b0469b5"
+  }
+]
