@@ -34,7 +34,8 @@
       "AFLFast",
       "MOPT"
     ],
-    "color": "greybox"
+    "color": "greybox",
+    "paperId": "ff4804de2b9db68a052d7113cae41ef2122a1c51"
   },
   {
     "name": "AFL-HIER",

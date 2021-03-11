@@ -1,0 +1,42 @@
+[
+  {
+    "name": "AFL",
+    "year": 2014,
+    "author": [
+      "Michał Zalewski"
+    ],
+    "toolurl": "http://lcamtuf.coredump.cx/afl/",
+    "targets": [
+      "File"
+    ],
+    "miscurl": [
+      "http://lcamtuf.coredump.cx/afl/technical_details.txt"
+    ],
+    "color": "greybox",
+    "paperId": "05c8b45ed31a8ee40f7234026982aeb60df8f73d"
+  },
+  {
+    "name": "Coverage-based_Greybox_Fuzzing_as_Markov_Chain",
+    "year": 2016,
+    "author": [
+      "Marcel Böhme",
+      "Van-Thuan Pham",
+      "Abhik Roychoudhury"
+    ],
+    "title": "Coverage-based Greybox Fuzzing as Markov Chain",
+    "booktitle": "Proceedings of the ACM Conference on Computer and Communications Security",
+    "miscurl": [
+      "https://mboehme.github.io/paper/CCS16.pdf",
+      "https://mboehme.github.io/paper/TSE18.pdf"
+    ],
+    "toolurl": "https://github.com/mboehme/aflfast",
+    "targets": [
+      "File"
+    ],
+    "references": [
+      "AFL"
+    ],
+    "color": "greybox",
+    "paperId": "99f88a55e46c3228a7d624ea9a959b9216a032ba"
+  }
+]
