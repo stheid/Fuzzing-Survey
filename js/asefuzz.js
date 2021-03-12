@@ -104,6 +104,13 @@ function appendPublicationOrCredit(list, node) {
             .text(node.name + buildAuthors(node) + ", " + node.year);
 }
 
+
+function appendAbstract(list, node) {
+    list.append("li")
+        .classed("list-group-item", true)
+        .text(node.abstract);
+}
+
 function constructIcon(faName, title) {
     return "<i class=\"fa " + faName + "\" title = \"" + title + "\"></i> ";
 }
@@ -205,15 +212,16 @@ function hideInfobox() {
 
 function createPaperEntry(cite) {
     return {
-        "name": cite.title.replace(/\s/g, "_"),
-        "year": cite.year,
-        "author": cite.authors.map(author => author.name),
-        "toolurl": "",
-        "miscurl": ['https://api.semanticscholar.org/' + cite.paperId],
-        "targets": [""],
-        "references": [],
-        "color": "greybox",
-        "paperId": cite.paperId
+        name: cite.title.replace(/\s/g, "_"),
+        year: cite.year,
+        abstract: cite.abstract,
+        author: cite.authors.map(author => author.name),
+        toolurl: "",
+        miscurl: ['https://api.semanticscholar.org/' + cite.paperId],
+        targets: [""],
+        references: [],
+        color: "greybox",
+        paperId: cite.paperId
     }
 }
 
@@ -272,6 +280,7 @@ function expandCitations(paperId) {
 function onClick(node) {
     let list = clearContents().append("ul").classed("list-group", true);
     appendPublicationOrCredit(list, node);
+    appendAbstract(list, node);
     appendTargetInfo(list, node);
     appendToolURL(list, node);
     appendMiscURL(list, node);
